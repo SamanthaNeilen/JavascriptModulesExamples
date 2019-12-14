@@ -1,0 +1,146 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+<div class="col">
+    <h1>Customer overview</h1>
+
+    @* Searchform *@
+    <div id="search-customer">
+        <div class="form-group row">
+            <label for="searchCustomerName" class="col-sm-2 col-form-label">@Texts.Name</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" id="searchCustomerName" value="">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="searchEmail" class="col-sm-2 col-form-label">@Texts.Email</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" id="searchEmail" value="">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="searchCountry" class="col-sm-2 col-form-label">@Texts.Country</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" id="searchCountry" value="">
+            </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary col-sm-2" onclick="filterData()">@Texts.Search</button>
+    </div>
+
+    @* Grid for data *@
+    <table class="table mt-2">
+        <thead>
+            <tr>
+                <th scope="col">@Texts.Name</th>
+                <th scope="col">@Texts.Email</th>
+                <th scope="col">@Texts.Country</th>
+            </tr>
+        </thead>
+        <tbody id="customer-table-body">
+            <tr class="loading-row">
+                <td colspan="3"><progress></progress></td>
+            </tr>
+        </tbody>
+    </table>
+
+    @* Row templates *@
+    <table class="display-none">
+        <tr id="data-row-template" class="customer-row">
+            <td>{name}</td>
+            <td>{email}</td>
+            <td>{country}</td>
+        </tr>
+    </table>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        const CUSTOMER_ROW_SELECTOR = '.customer-row',
+            LOADING_ROW_SELECTOR = '.loading-row',
+            DISPLAY_NONE_CLASS = 'display-none',
+            CUSTOMER_TABLE_BODY = $('#customer-table-body');
+
+        function loadData() {
+            showLoader();
+
+            $.get('https://localhost:44313/api/customer')
+                .done(function (customerList, textStatus, jqXHR) {
+                    CUSTOMER_TABLE_BODY.html(getDataRows(customerList));
+                    showCustomerRows(CUSTOMER_TABLE_BODY.find(CUSTOMER_ROW_SELECTOR));
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('error ' + textStatus + ' ' + errorThrown);
+                });
+        }
+
+        function getDataRows(customerList) {
+            const outerHtmlProperty = 'outerHTML';
+            const dataRowTemplateId = 'data-row-template';
+            const rowTemplate = $('#' + dataRowTemplateId).prop(outerHtmlProperty)
+                .replace('id="' + dataRowTemplateId + '"', '');
+
+            let dataRows = $(LOADING_ROW_SELECTOR).prop(outerHtmlProperty);
+
+            $.each(customerList,
+                function (index, customer) {
+                    dataRows += rowTemplate
+                        .replace('{name}', customer.name)
+                        .replace('{email}', customer.email)
+                        .replace('{country}', customer.country);
+                });
+
+            return dataRows;
+        }
+
+        function showLoader() {
+            CUSTOMER_TABLE_BODY.find(LOADING_ROW_SELECTOR).removeClass(DISPLAY_NONE_CLASS);
+
+            const dataRows = CUSTOMER_TABLE_BODY.find(CUSTOMER_ROW_SELECTOR);
+            $.each(dataRows,
+                function (index, row) {
+                    $(row).addClass(DISPLAY_NONE_CLASS);
+                });
+        }
+
+        function showCustomerRows(customerRows) {
+            $.each(customerRows,
+                function (index, row) {
+                    $(row).removeClass(DISPLAY_NONE_CLASS);
+                });
+            CUSTOMER_TABLE_BODY.find(LOADING_ROW_SELECTOR).addClass(DISPLAY_NONE_CLASS);
+        }
+
+        function filterData() {
+            showLoader();
+
+            const customerRows = CUSTOMER_TABLE_BODY.find(CUSTOMER_ROW_SELECTOR);
+            const searchName = $('#searchCustomerName').val();
+            const searchEmail = $('#searchEmail').val();
+            const searchCountry = $('#searchCountry').val();
+
+            const rowsToShow = $.grep(customerRows,
+                function (customerRow) {
+                    let columns = $(customerRow).find('td');
+
+                    return isMatchForFilter(searchName, columns[0].innerHTML) &&
+                        isMatchForFilter(searchEmail, columns[1].innerHTML) &&
+                        isMatchForFilter(searchCountry, columns[2].innerHTML);
+
+
+                });
+
+           showCustomerRows(rowsToShow);
+        }
+
+        function isMatchForFilter(searchValue, valueInRow) {
+            return searchValue === '' ||
+                valueInRow.indexOf(searchValue) !== -1;
+        }
+
+        $(document).ready(function () {
+            loadData();
+        });
+    </script>
+}
