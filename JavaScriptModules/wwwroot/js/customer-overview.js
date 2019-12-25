@@ -1,8 +1,16 @@
 ﻿(function ($, customerService, utilitiesModule) {
+
+    ///...
+
     const CURRENT_MODULE = {},
         CUSTOMER_ROW_SELECTOR = '.customer-row',
         LOADING_ROW_SELECTOR = '.loading-row',
         CUSTOMER_TABLE_BODY = $('#customer-table-body');
+
+    CURRENT_MODULE.initialize = function() {
+        $('#customerOverviewSearchButton').on('click', CURRENT_MODULE.filterData);
+        CURRENT_MODULE.loadData();
+    };
 
     CURRENT_MODULE.loadData = function () {
         showLoader();
@@ -87,5 +95,5 @@
 })(jQuery, window.customerService, window.utilitiesModule);
 
 $(document).ready(function () {
-    window.customerOverviewModule.loadData();
+    window.customerOverviewModule.initialize();
 });
