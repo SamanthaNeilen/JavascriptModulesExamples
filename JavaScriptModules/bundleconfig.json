@@ -2,5 +2,18 @@
   {
     "outputFileName": "wwwroot/css/site.min.css",
     "inputFiles": [ "wwwroot/css/site.css" ]
+  },
+  {
+    "outputFileName": "wwwroot/js/dist/customer-overview.min.js",
+    "inputFiles": [
+      "wwwroot/js/utilities.js",
+      "wwwroot/js/customer-service.js",
+      "wwwroot/js/customer-overview.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
   }
 ]

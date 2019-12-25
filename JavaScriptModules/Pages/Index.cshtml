@@ -26,7 +26,7 @@
                 <input type="text" class="form-control" id="searchCountry" value="">
             </div>
         </div>
-        <button type="button" class="btn btn-sm btn-primary col-sm-2" onclick="filterData()">@Texts.Search</button>
+        <button type="button" class="btn btn-sm btn-primary col-sm-2" onclick="window.customerOverviewModule.filterData()">@Texts.Search</button>
     </div>
 
     @* Grid for data *@
@@ -56,91 +56,12 @@
 </div>
 
 @section Scripts {
-    <script type="text/javascript">
-        const CUSTOMER_ROW_SELECTOR = '.customer-row',
-            LOADING_ROW_SELECTOR = '.loading-row',
-            DISPLAY_NONE_CLASS = 'display-none',
-            CUSTOMER_TABLE_BODY = $('#customer-table-body');
-
-        function loadData() {
-            showLoader();
-
-            $.get('https://localhost:44313/api/customer')
-                .done(function (customerList, textStatus, jqXHR) {
-                    CUSTOMER_TABLE_BODY.html(getDataRows(customerList));
-                    showCustomerRows(CUSTOMER_TABLE_BODY.find(CUSTOMER_ROW_SELECTOR));
-                })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                    alert('error ' + textStatus + ' ' + errorThrown);
-                });
-        }
-
-        function getDataRows(customerList) {
-            const outerHtmlProperty = 'outerHTML';
-            const dataRowTemplateId = 'data-row-template';
-            const rowTemplate = $('#' + dataRowTemplateId).prop(outerHtmlProperty)
-                .replace('id="' + dataRowTemplateId + '"', '');
-
-            let dataRows = $(LOADING_ROW_SELECTOR).prop(outerHtmlProperty);
-
-            $.each(customerList,
-                function (index, customer) {
-                    dataRows += rowTemplate
-                        .replace('{name}', customer.name)
-                        .replace('{email}', customer.email)
-                        .replace('{country}', customer.country);
-                });
-
-            return dataRows;
-        }
-
-        function showLoader() {
-            CUSTOMER_TABLE_BODY.find(LOADING_ROW_SELECTOR).removeClass(DISPLAY_NONE_CLASS);
-
-            const dataRows = CUSTOMER_TABLE_BODY.find(CUSTOMER_ROW_SELECTOR);
-            $.each(dataRows,
-                function (index, row) {
-                    $(row).addClass(DISPLAY_NONE_CLASS);
-                });
-        }
-
-        function showCustomerRows(customerRows) {
-            $.each(customerRows,
-                function (index, row) {
-                    $(row).removeClass(DISPLAY_NONE_CLASS);
-                });
-            CUSTOMER_TABLE_BODY.find(LOADING_ROW_SELECTOR).addClass(DISPLAY_NONE_CLASS);
-        }
-
-        function filterData() {
-            showLoader();
-
-            const customerRows = CUSTOMER_TABLE_BODY.find(CUSTOMER_ROW_SELECTOR);
-            const searchName = $('#searchCustomerName').val();
-            const searchEmail = $('#searchEmail').val();
-            const searchCountry = $('#searchCountry').val();
-
-            const rowsToShow = $.grep(customerRows,
-                function (customerRow) {
-                    let columns = $(customerRow).find('td');
-
-                    return isMatchForFilter(searchName, columns[0].innerHTML) &&
-                        isMatchForFilter(searchEmail, columns[1].innerHTML) &&
-                        isMatchForFilter(searchCountry, columns[2].innerHTML);
-
-
-                });
-
-           showCustomerRows(rowsToShow);
-        }
-
-        function isMatchForFilter(searchValue, valueInRow) {
-            return searchValue === '' ||
-                valueInRow.indexOf(searchValue) !== -1;
-        }
-
-        $(document).ready(function () {
-            loadData();
-        });
-    </script>
+    <environment include="Development">
+        <script src="~/js/utilities.js"></script>
+        <script src="~/js/customer-service.js"></script>
+        <script src="~/js/customer-overview.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/js/dist/customer-overview.min.js"></script>
+    </environment>
 }
