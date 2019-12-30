@@ -1,7 +1,4 @@
 ﻿(function ($, customerService, utilitiesModule) {
-
-    ///...
-
     const CURRENT_MODULE = {},
         CUSTOMER_ROW_SELECTOR = '.customer-row',
         LOADING_ROW_SELECTOR = '.loading-row',
