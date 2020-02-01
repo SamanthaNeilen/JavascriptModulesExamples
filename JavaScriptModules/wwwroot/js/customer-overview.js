@@ -2,7 +2,7 @@
     const CURRENT_MODULE = {},
         CUSTOMER_ROW_SELECTOR = '.customer-row',
         LOADING_ROW_SELECTOR = '.loading-row',
-        CUSTOMER_TABLE_BODY = $('#customer-table-body');
+        CUSTOMER_TABLE_BODY = '#customer-table-body';
 
     CURRENT_MODULE.initialize = function() {
         $('#customerOverviewSearchButton').on('click', CURRENT_MODULE.filterData);
@@ -18,7 +18,7 @@
     CURRENT_MODULE.filterData = function () {
         showLoader();
 
-        const customerRows = CUSTOMER_TABLE_BODY.find(CUSTOMER_ROW_SELECTOR);
+        const customerRows = $(CUSTOMER_TABLE_BODY).find(CUSTOMER_ROW_SELECTOR);
         const searchName = $('#searchCustomerName').val();
         const searchEmail = $('#searchEmail').val();
         const searchCountry = $('#searchCountry').val();
@@ -36,7 +36,7 @@
     };
 
     function showCustomerData(customerList) {
-        CUSTOMER_TABLE_BODY.html(getDataRows(customerList));
+        $(CUSTOMER_TABLE_BODY).html(getDataRows(customerList));
         showCustomerRows();
     }
 
@@ -60,23 +60,23 @@
     }
 
     function showLoader() {
-        utilitiesModule.showElement(LOADING_ROW_SELECTOR, CUSTOMER_TABLE_BODY);
+        utilitiesModule.showElement(LOADING_ROW_SELECTOR, $(CUSTOMER_TABLE_BODY));
 
         forEachCustomerRow(function (row) {
-            utilitiesModule.hideElement(row, CUSTOMER_TABLE_BODY);
+            utilitiesModule.hideElement(row, $(CUSTOMER_TABLE_BODY));
         });
     }
 
     function showCustomerRows(filteredRows) {
         forEachCustomerRow(function (row) {
-            utilitiesModule.showElement(row, CUSTOMER_TABLE_BODY);
+            utilitiesModule.showElement(row, $(CUSTOMER_TABLE_BODY));
         }, filteredRows);
 
-        utilitiesModule.hideElement(LOADING_ROW_SELECTOR, CUSTOMER_TABLE_BODY);
+        utilitiesModule.hideElement(LOADING_ROW_SELECTOR, $(CUSTOMER_TABLE_BODY));
     }
 
     function forEachCustomerRow(callBack, filteredRows) {
-        let customerRows = CUSTOMER_TABLE_BODY.find(CUSTOMER_ROW_SELECTOR);
+        let customerRows = $(CUSTOMER_TABLE_BODY).find(CUSTOMER_ROW_SELECTOR);
         if (filteredRows !== undefined) {
             customerRows = filteredRows;
         }
